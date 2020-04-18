@@ -1,0 +1,43 @@
+version: "3.1"
+services:
+
+  nginx-php-fpm:
+    image: richarvey/nginx-php-fpm:latest
+    restart: always
+    ports:
+    - "80:80"
+    volumes:
+    - ./src:/var/www
+    - ./lnmp/conf/nginx:/etc/nginx/sites-available
+#    environment:
+#      SSH_KEY: '<YOUR _KEY_HERE>'
+#      GIT_REPO: 'git@github.com:<YOUR_ACCOUNT>/<YOUR_REPO>.git'
+#      GIT_EMAIL: 'void@ngd.io'
+#      GIT_NAME: '<YOUR_NAME>'
+    links:
+      - mariadb
+
+  mariadb:
+    image: mariadb:latest
+    container_name: database
+    volumes:
+      - ./lnmp/mariadb:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: develdb
+    ports:
+      - "3306:3306"
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin
+    links:
+      - mariadb
+    ports:
+      - 8080:80
+    environment:
+      PMA_HOST: mariadb
+      PMA_USER: root
+      PMA_PASSWORD: root
+      PMA_ARBITRARY: 1
+
